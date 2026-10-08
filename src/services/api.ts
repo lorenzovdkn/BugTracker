@@ -31,4 +31,24 @@ export class Ticket {
         const data = await res.json();
         return data.member.map((ticket: any) => Ticket.fromJson(ticket));
     }
+
+    static async getTicket(id: string): Promise<TicketDto> {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tickets/${id}`);
+
+        if (!res.ok) {
+            throw new Error(`Failed to fetch ticket: ${res.status} ${res.statusText}`);
+        }
+
+        return Ticket.fromJson(await res.json());
+    }
+
+    static async deleteTicket(id: string): Promise<void> {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tickets/${id}`, {
+            method: 'DELETE',
+        });
+
+        if (res.status !== 204) {
+            throw new Error(`Failed to delete ticket: ${res.status} ${res.statusText}`);
+        }
+    }
 }
