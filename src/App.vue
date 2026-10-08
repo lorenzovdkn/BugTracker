@@ -1,23 +1,14 @@
-<script setup lang="ts">
-import TicketTab from './components/TicketTab.vue';
-import { Ticket } from './services/api.ts';
-import type { TicketDto } from './types/api.types.ts';
-
-const getTickets = () => Ticket.getTickets();
-Ticket.getTickets().then((tickets: TicketDto[]) => {
-  console.log('Tickets:', tickets);
-}).catch((error) => {
-  console.error('Error fetching tickets:', error);
-});
-
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <TicketTab />
+  <nav class="navbar navbar-expand bg-body-tertiary">
+    <div class="container">
+      <RouterLink class="navbar-brand" :to="{ name: 'dashboard' }">Bug Tracker</RouterLink>
+      <RouterLink class="btn btn-primary" :to="{ name: 'new-ticket' }">Nouveau ticket</RouterLink>
+    </div>
+  </nav>
 
-  <div class="container mt-4">
-      <div class="dropdown mt-3">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"></button>
-      </div>
-  </div>
+  <main class="container ">
+    <RouterView />
+  </main>
 </template>
