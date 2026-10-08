@@ -1,19 +1,8 @@
 <script setup lang="ts">
 import type { TicketDto } from '../types/api.types.ts';
+import { statuses, priorities } from '../utils/ticketLabels.ts';
 
 defineProps<{ ticket: TicketDto }>();
-
-const statuses = {
-    open: { label: 'Ouvert', color: 'text-bg-danger' },
-    in_progress: { label: 'En cours', color: 'text-bg-warning' },
-    resolved: { label: 'Résolu', color: 'text-bg-success' },
-};
-
-const priorities = {
-    low: { label: 'Basse', color: 'text-secondary' },
-    medium: { label: 'Moyenne', color: 'text-warning' },
-    high: { label: 'Haute', color: 'text-danger' },
-};
 </script>
 
 <template>
@@ -45,7 +34,6 @@ const priorities = {
 </template>
 
 <style scoped>
-/* Zoom léger au survol */
 .card {
     transition: transform 0.15s;
 }
@@ -54,7 +42,6 @@ const priorities = {
     transform: scale(1.03);
 }
 
-/* Coupe la description après 3 lignes */
 .description {
     display: -webkit-box;
     -webkit-box-orient: vertical;
