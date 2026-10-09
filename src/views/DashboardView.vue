@@ -27,6 +27,20 @@ onMounted(async () => {
   <div class="container">
     <div class="container-header my-4 d-flex justify-content-between align-items-center">
       <h1 class="my-0">Dashboard</h1>
+      <div class="row justify-content-center">
+        <div>
+            <form>
+                <div class="input-group mb-3">
+                    <select class="form-select" style="max-width: 150px;">
+                            <option selected>All Categories</option>
+                            <option value="1">Category 1</option>
+                            <option value="2">Category 2</option>
+                            <option value="3">Category 3</option>
+                        </select>
+                </div>
+            </form>
+        </div>
+    </div>
       <div class="input-group w-auto">
         <div class="form-outline" data-mdb-input-init>
           <input  type="search" v-model="search" class="form-control" placeholder="Search" aria-label="Search" />
