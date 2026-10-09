@@ -59,13 +59,13 @@ const onSubmit = () => {
             <form novalidate @submit.prevent="onSubmit">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title:</label>
-                    <input id="title" v-model.trim="formData.title" class="form-control" :class="{ 'is-invalid': errors.title }" />
+                    <input id="title" v-model.trim="formData.title" class="form-control" :class="{ 'is-invalid': errors.title }" :disabled="!!props.ticket" />
                     <div v-if="errors.title" class="invalid-feedback">{{ errors.title }}</div>
                     <div v-else class="form-text">Entre 3 et 255 caractères.</div>
                 </div>
                 <div class="mb-3">
                     <label for="description" class="form-label">Description:</label>
-                    <textarea id="description" v-model.trim="formData.description" class="form-control" :class="{ 'is-invalid': errors.description }" rows="4"></textarea>
+                    <textarea id="description" v-model.trim="formData.description" class="form-control" :class="{ 'is-invalid': errors.description }" rows="4" :disabled="!!props.ticket"></textarea>
                     <div v-if="errors.description" class="invalid-feedback">{{ errors.description }}</div>
                     <div v-else class="form-text">15 caractères minimum.</div>
                 </div>

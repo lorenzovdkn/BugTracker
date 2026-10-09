@@ -1,62 +1,51 @@
 <script setup lang="ts">
-import { ref, onMounted, computed} from 'vue';
-import CardTicket from '../components/CardTicket.vue';
+import { ref, onMounted, watch } from 'vue';
+import FilterBar from '../components/FilterBar.vue';
+import PaginationBar from '../components/PaginationBar.vue';
+import TicketTable from '../components/TicketTable.vue';
 import { Ticket } from '../services/api.ts';
 import type { TicketDto } from '../types/api.types.ts';
 
 const tickets = ref<TicketDto[]>([]);
 const error = ref('');
+const page = ref(1);
+const totalPages = ref(1);
 const search = ref('');
-const filteredTickets = computed(() => {
-  const q = search.value.trim().toLowerCase();
-  if (!q) return tickets.value;
-  return tickets.value.filter(t =>
-    [t.title, t.description].some(f => f?.toLowerCase().includes(q))
-  );
-});
-onMounted(async () => {
+const status = ref('');
+const priority = ref('');
+
+const loadTickets = async (newPage: number) => {
   try {
-    tickets.value = await Ticket.getTickets();
+    const result = await Ticket.getTickets(newPage, {
+      title: search.value.trim(),
+      status: status.value,
+      priority: priority.value,
+    });
+    tickets.value = result.tickets;
+    totalPages.value = result.totalPages;
+    page.value = newPage;
   } catch (e) {
     console.error('Error fetching tickets:', e);
     error.value = 'Impossible de charger les tickets.';
   }
-});
+};
+
+onMounted(() => loadTickets(1));
+
+// Quand un filtre change, on redemande les tickets à l'API en repartant de la page 1
+watch([search, status, priority], () => loadTickets(1));
 </script>
 <template>
   <div class="container">
-    <div class="container-header my-4 d-flex justify-content-between align-items-center">
+    <div class="my-4 d-flex justify-content-between align-items-center">
       <h1 class="my-0">Dashboard</h1>
-      <div class="row justify-content-center">
-        <div>
-            <form>
-                <div class="input-group mb-3">
-                    <select class="form-select" style="max-width: 150px;">
-                            <option selected>All Categories</option>
-                            <option value="1">Category 1</option>
-                            <option value="2">Category 2</option>
-                            <option value="3">Category 3</option>
-                        </select>
-                </div>
-            </form>
-        </div>
+      <FilterBar v-model:search="search" v-model:status="status" v-model:priority="priority" />
     </div>
-      <div class="input-group w-auto">
-        <div class="form-outline" data-mdb-input-init>
-          <input  type="search" v-model="search" class="form-control" placeholder="Search" aria-label="Search" />
-        </div>
-        <div class="bg-primary d-flex align-items-center justify-content-center px-3">
-          <img src="\src\assets\rechercher.png" alt="search" width="20" height="20" />
-        </div>
-    </div>
-  </div>
 
     <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
-    <div class="row g-3">
-      <div v-for="ticket in filteredTickets" :key="ticket.id" class="col-md-6">
-        <CardTicket :ticket="ticket" />
-      </div>
-    </div>
+    <TicketTable :tickets="tickets" />
+
+    <PaginationBar :page="page" :total-pages="totalPages" @change="loadTickets" />
   </div>
 </template>

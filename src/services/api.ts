@@ -1,4 +1,4 @@
-import type { TicketDto, TicketFormData, TicketFormErrors } from "../types/api.types";
+import type { TicketDto, TicketFilters, TicketFormData, TicketFormErrors } from "../types/api.types";
 
 export class ApiError extends Error {
     violations: TicketFormErrors;
@@ -24,6 +24,9 @@ export class ApiError extends Error {
     }
 }
 
+// Nombre de tickets renvoyés par page par l'API
+const ITEMS_PER_PAGE = 30;
+
 export class Ticket {
     id: string;
     title: string;
@@ -45,15 +48,24 @@ export class Ticket {
         return new Ticket(json);
     }
 
-    static async getTickets(): Promise<TicketDto[]> {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tickets`);
+    static async getTickets(page: number, filters: TicketFilters = {}): Promise<{ tickets: TicketDto[]; totalPages: number }> {
+        const params = new URLSearchParams({ page: String(page) });
+        // Un filtre vide ne doit pas être envoyé : l'API chercherait une valeur vide et ne renverrait rien
+        if (filters.title) params.set('title', filters.title);
+        if (filters.status) params.set('status', filters.status);
+        if (filters.priority) params.set('priority', filters.priority);
+
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tickets?${params}`);
 
         if (!res.ok) {
             throw new Error(`Failed to fetch tickets: ${res.status} ${res.statusText}`);
         }
 
         const data = await res.json();
-        return data.member.map((ticket: any) => Ticket.fromJson(ticket));
+        return {
+            tickets: data.member.map((ticket: any) => Ticket.fromJson(ticket)),
+            totalPages: Math.ceil(data.totalItems / ITEMS_PER_PAGE),
+        };
     }
 
     static async getTicket(id: string): Promise<TicketDto> {
@@ -84,7 +96,7 @@ export class Ticket {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/api/tickets/${id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/merge-patch+json' },
-            body: JSON.stringify(data),
+            body: JSON.stringify({ status: data.status, priority: data.priority }),
         });
 
         if (!res.ok) {
