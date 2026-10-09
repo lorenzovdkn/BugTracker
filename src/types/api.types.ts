@@ -6,3 +6,7 @@ export interface TicketDto {
   priority: 'low' | 'medium' | 'high'
   createdAt: string
 }
+
+export type TicketFormData = Omit<TicketDto, 'id' | 'createdAt'>
+
+export type TicketFormErrors = Partial<Record<keyof TicketFormData, string>>
